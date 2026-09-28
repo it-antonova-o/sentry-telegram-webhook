@@ -1,47 +1,64 @@
 import { HookMessageDataType } from './app';
 
+function getIssueEmoji(issueAction?: string): string {
+  switch (issueAction) {
+    case 'resolved':
+      return '✅';
+    default:
+      return '💣';
+  }
+}
+
+function getIssueLevel(level?: string): 'Warning' | 'Error' {
+  return level?.trim().toLowerCase() === 'warning' ? 'Warning' : 'Error';
+}
+
+function formatOptionalField(label: string, value?: string): string {
+  if (!value || value.trim().toLowerCase() === 'none') {
+    return '';
+  }
+  return `\\- *${label}:* ${value}\n`;
+}
+
 export function generateHookMessageEn(data: HookMessageDataType) {
   const _data: HookMessageDataType = escapedHookMessageData(data);
+  const emoji = getIssueEmoji(data.issueAction);
+  const level = getIssueLevel(data.level);
   return `
-*💣 Issue ${_data.issueAction}:*
+*${emoji} Issue ${_data.issueAction}:*
 \\- *Project:* ${_data.appName || 'none'}
 \\- *Title:* ${_data.title || 'none'}
+\\- *Level:* ${level}
 \\- *Position:* ${_data.errorPosition || 'none'}
-\\- *Environment:* ${_data.environment || 'none'}
-\\- *Version:* ${_data.release || 'none'}
-\\- *Devices:* ${_data.device || 'none'}
-\\- *Operation System:* ${_data.os || 'none'}
-*Detail:* [HERE](${_data.detailLink})
+${formatOptionalField('Environment', _data.environment)}${formatOptionalField('Version', _data.release)}${formatOptionalField('Devices', _data.device)}${formatOptionalField('Operation System', _data.os)}${formatOptionalField('Category', _data.category)}${formatOptionalField('Server name', _data.server_name)}${formatOptionalField('URL', _data.url)}*Detail:* [HERE](${_data.detailLink})
   `;
 }
 
 export function generateHookMessageVi(data: HookMessageDataType) {
   const _data: HookMessageDataType = escapedHookMessageData(data);
+  const emoji = getIssueEmoji(data.issueAction);
+  const level = getIssueLevel(data.level);
   return `
-*💣 Lỗi về \\(${_data.issueAction || 'none'}\\):*
+*${emoji} Lỗi về \\(${_data.issueAction || 'none'}\\):*
 \\- *Tên app:* ${_data.appName || 'none'}
 \\- *Tiêu đề:* ${_data.title || 'none'}
+\\- *Mức độ:* ${level}
 \\- *Lỗi ở:* ${_data.errorPosition || 'none'}
-\\- *Môi trường:* ${_data.environment || 'none'}
-\\- *Phiên bản:* ${_data.release || 'none'}
-\\- *Thiết bị:* ${_data.device || 'none'}
-\\- *Hệ điều hành:* ${_data.os || 'none'}
-*Xem chi tiết:* [TẠI ĐÂY](${_data.detailLink}) 
+${formatOptionalField('Môi trường', _data.environment)}${formatOptionalField('Phiên bản', _data.release)}${formatOptionalField('Thiết bị', _data.device)}${formatOptionalField('Hệ điều hành', _data.os)}${formatOptionalField('Danh mục', _data.category)}${formatOptionalField('Máy chủ', _data.server_name)}${formatOptionalField('URL', _data.url)}*Xem chi tiết:* [TẠI ĐÂY](${_data.detailLink}) 
   `;
 }
 
 export function generateHookMessageRu(data: HookMessageDataType) {
   const _data: HookMessageDataType = escapedHookMessageData(data);
+  const emoji = getIssueEmoji(data.issueAction);
+  const level = getIssueLevel(data.level);
   return `
-*💣 Ошибка \\(${_data.issueAction || 'none'}\\):*
+*${emoji} Ошибка \\(${_data.issueAction || 'none'}\\):*
 \\- *Проект:* ${_data.appName || 'none'}
 \\- *Заголовок:* ${_data.title || 'none'}
+\\- *Уровень:* ${level}
 \\- *Позиция:* ${_data.errorPosition || 'none'}
-\\- *Окружение:* ${_data.environment || 'none'}
-\\- *Версия:* ${_data.release || 'none'}
-\\- *Устройство:* ${_data.device || 'none'}
-\\- *ОС:* ${_data.os || 'none'}
-*Подробнее:* [ЗДЕСЬ](${_data.detailLink})
+${formatOptionalField('Окружение', _data.environment)}${formatOptionalField('Версия', _data.release)}${formatOptionalField('Устройство', _data.device)}${formatOptionalField('ОС', _data.os)}${formatOptionalField('Категория', _data.category)}${formatOptionalField('Сервер', _data.server_name)}${formatOptionalField('URL', _data.url)}*Подробнее:* [ЗДЕСЬ](${_data.detailLink})
   `;
 }
 

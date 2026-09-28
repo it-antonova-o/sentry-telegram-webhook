@@ -42,6 +42,7 @@ $ npm install
 | SENTRY_INTEGRATION_TOKEN       | Yes        | string | The token that geneate by sentry. Check [HERE](https://docs.sentry.io/organization/integrations/integration-platform/#permissions) for more detail.                                                                                           |       |
 | SENTRY_ORGANIZATION_SLUG       | Yes        | string | The organization slug in your sentry organization setting                                                                                                                                                                                     |       |
 | SENTRY_PROJECT_SLUG_ALLOW_LIST | No         | string | your Project slug list (Not require - split with comma `,` character)setting                                                                                                                                                                  |       |
+| SEND_RESOLVED_NOTIFICATIONS    | No         | boolean | Send resolved issue notifications. Defaults to `false`                                                                                                                                                                                       | false |
 
 ## Custom Integrations Configuration
 
@@ -76,6 +77,7 @@ $ npm install
    SENTRY_INTEGRATION_TOKEN=<token in Custom Integrations in Sentry Setting>
    SENTRY_ORGANIZATION_SLUG=<your Sentry org slug>
    SENTRY_PROJECT_SLUG_ALLOW_LIST=<your Project slug list (Not require - split with comma `,` character)>
+   SEND_RESOLVED_NOTIFICATIONS=false
    ```
 
 3. Run with npm
@@ -111,6 +113,7 @@ $ npm install
       -e SENTRY_INTEGRATION_TOKEN=<SENTRY_INTEGRATION_TOKEN> \ #token in Custom Integrations in Sentry Setting
       -e SENTRY_ORGANIZATION_SLUG=<SENTRY_ORGANIZATION_SLUG> \ #your Sentry org slug
       -e SENTRY_PROJECT_SLUG_ALLOW_LIST=<SENTRY_PROJECT_SLUG_ALLOW_LIST> \ #your Project slug list (Not require - split with comma `,` character)
+      -e SEND_RESOLVED_NOTIFICATIONS=false \
       tuanngocptn/sentry-telegram-webhook:latest
     ```
 
@@ -134,6 +137,7 @@ $ npm install
         - SENTRY_INTEGRATION_TOKEN=<token in Custom Integrations in Sentry Setting>
         - SENTRY_ORGANIZATION_SLUG=<your Sentry org slug>
         - SENTRY_PROJECT_SLUG_ALLOW_LIST=<your Project slug list (Not require - split with comma `,` character)>
+        - SEND_RESOLVED_NOTIFICATIONS=false
       ports:
         - 3000:3000
       volumes:
@@ -160,6 +164,7 @@ $ npm install
     - SENTRY_INTEGRATION_TOKEN=<token in Custom Integrations in Sentry Setting>
     - SENTRY_ORGANIZATION_SLUG=<your Sentry org slug>
     - SENTRY_PROJECT_SLUG_ALLOW_LIST=<your Project slug list (Not require - split with comma `,` character)>
+    - SEND_RESOLVED_NOTIFICATIONS=false
   ```
 
 - Run with docker:
@@ -188,6 +193,7 @@ $ npm install
     - SENTRY_INTEGRATION_TOKEN=<token in Custom Integrations in Sentry Setting>
     - SENTRY_ORGANIZATION_SLUG=<your Sentry org slug>
     - SENTRY_PROJECT_SLUG_ALLOW_LIST=<your Project slug list (Not require - split with comma `,` character)>
+    - SEND_RESOLVED_NOTIFICATIONS=false
   ```
 
 - Run with docker:

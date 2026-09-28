@@ -108,6 +108,8 @@ export type HookMessageDataType = {
   os?: string;
   browser?: string;
   runtime?: string;
+  category?: string;
+  server_name?: string;
   url?: string;
   detailLink?: string;
 };

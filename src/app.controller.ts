@@ -38,6 +38,21 @@ export class AppController {
         const action = reqBody.action;
         const data = reqBody.data;
 
+        if (action === 'created') {
+          this.logger.info(
+            'Created notification skipped; waiting for an alert rule trigger',
+          );
+          return;
+        }
+
+        const sendResolvedNotifications =
+          process.env.SEND_RESOLVED_NOTIFICATIONS?.trim().toLowerCase() ===
+          'true';
+        if (action === 'resolved' && !sendResolvedNotifications) {
+          this.logger.info('Resolved notification skipped');
+          return;
+        }
+
         let title: string;
         let culprit: string;
         let projectName: string = 'Unknown';
@@ -118,7 +133,19 @@ export class AppController {
             user: this.formatUser(event.user),
             browser: contexts.browser?.browser || '',
             runtime: contexts.runtime?.runtime || '',
-            url: event.request?.url || '',
+            category:
+              this.getTagValue(event.tags, 'category') ||
+              event.issue_category ||
+              '',
+            server_name:
+              this.getTagValue(event.tags, 'server_name') ||
+              event.server_name ||
+              contexts.server?.name ||
+              '',
+            url:
+              event.request?.url ||
+              this.getTagValue(event.tags, 'url') ||
+              '',
           };
         } else if (data.error) {
           // error.created - the most detailed type
@@ -166,7 +193,19 @@ export class AppController {
             user: this.formatUser(error.user),
             browser: contexts.browser?.browser || '',
             runtime: contexts.runtime?.runtime || '',
-            url: error.request?.url || '',
+            category:
+              this.getTagValue(error.tags, 'category') ||
+              error.issue_category ||
+              '',
+            server_name:
+              this.getTagValue(error.tags, 'server_name') ||
+              error.server_name ||
+              contexts.server?.name ||
+              '',
+            url:
+              error.request?.url ||
+              this.getTagValue(error.tags, 'url') ||
+              '',
           };
         } else {
           this.logger.info('Unknown event structure, skipping');
@@ -223,5 +262,19 @@ export class AppController {
   private formatUser(user: any): string {
     if (!user) return '';
     return user.email || user.username || user.id || '';
+  }
+
+  private getTagValue(tags: any, key: string): string {
+    if (!tags) return '';
+    if (!Array.isArray(tags)) {
+      return tags[key] || '';
+    }
+
+    const tag = tags.find(
+      (item) =>
+        (Array.isArray(item) && item[0] === key) ||
+        (!Array.isArray(item) && item?.key === key),
+    );
+    return Array.isArray(tag) ? tag[1] || '' : tag?.value || '';
   }
 }
