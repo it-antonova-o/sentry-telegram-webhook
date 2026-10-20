@@ -43,6 +43,28 @@ $ npm install
 | SENTRY_ORGANIZATION_SLUG       | Yes        | string | The organization slug in your sentry organization setting                                                                                                                                                                                     |       |
 | SENTRY_PROJECT_SLUG_ALLOW_LIST | No         | string | your Project slug list (Not require - split with comma `,` character)setting                                                                                                                                                                  |       |
 | SEND_RESOLVED_NOTIFICATIONS    | No         | boolean | Send resolved issue notifications. Defaults to `false`                                                                                                                                                                                       | false |
+| SENTRY_IGNORE_RULES            | No         | JSON array | Rules suppressing Telegram notifications by `title` and/or `category`. Defaults to `[]`. See below. | [] |
+
+### Ignoring selected errors
+
+Set `SENTRY_IGNORE_RULES` to a JSON array of rules. For example, in `.env`:
+
+```dotenv
+SENTRY_IGNORE_RULES='[{"title":"*ExampleError: expected failure*","category":"exception.ExampleError"},{"title":"*Example connection timeout*","category":"example.connection"}]'
+```
+
+For Docker Compose, add this entry under `environment`:
+
+```yaml
+- 'SENTRY_IGNORE_RULES=[{"title":"*ExampleError: expected failure*","category":"exception.ExampleError"},{"title":"*Example connection timeout*","category":"example.connection"}]'
+```
+
+- All fields in a rule must match (AND); matching any rule suppresses the notification (OR).
+- Each rule must have `title`, `category`, or both. Omit `category` to filter only by title, or omit `title` to filter an entire category.
+- Matching is case-sensitive and covers the whole field. `*` matches any sequence of characters, including line breaks. All other characters are literal, not regular expressions.
+- Category is read from the event's `category` tag, falling back to `issue_category`. Issue notifications use the API's category tag, falling back to `issueCategory`.
+- An unset/empty variable or `[]` disables filtering. Invalid JSON or invalid rules prevent startup with an `Invalid SENTRY_IGNORE_RULES` error.
+- Only Telegram delivery is suppressed; the error remains in Sentry. Skipped notifications are logged. Restart/recreate the app after changing the environment variable.
 
 ## Custom Integrations Configuration
 

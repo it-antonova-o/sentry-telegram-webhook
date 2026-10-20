@@ -81,6 +81,8 @@ export class AppController {
               'Failed to get issue details, continuing without them',
             );
           }
+          issueDetails.category =
+            issueDetails.category || data.issue.issueCategory || '';
         } else if (data.event) {
           // event_alert.triggered
           const event = data.event as any;
@@ -143,9 +145,7 @@ export class AppController {
               contexts.server?.name ||
               '',
             url:
-              event.request?.url ||
-              this.getTagValue(event.tags, 'url') ||
-              '',
+              event.request?.url || this.getTagValue(event.tags, 'url') || '',
           };
         } else if (data.error) {
           // error.created - the most detailed type
@@ -203,9 +203,7 @@ export class AppController {
               contexts.server?.name ||
               '',
             url:
-              error.request?.url ||
-              this.getTagValue(error.tags, 'url') ||
-              '',
+              error.request?.url || this.getTagValue(error.tags, 'url') || '',
           };
         } else {
           this.logger.info('Unknown event structure, skipping');
@@ -229,6 +227,13 @@ export class AppController {
             `${process.env.SENTRY_URL}/organizations/${process.env.SENTRY_ORGANIZATION_SLUG}/issues/${issueId}/`,
           ...issueDetails,
         };
+
+        if (this.appHelper.isIgnoredNotification(hookMessageData)) {
+          this.logger.info(
+            'Telegram notification skipped by SENTRY_IGNORE_RULES',
+          );
+          return;
+        }
 
         await this.appService.sentTelegramMessage(hookMessageData);
         this.logger.info('Telegram message sent successfully');
