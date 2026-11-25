@@ -6,6 +6,7 @@ import { Logger } from 'winston';
 
 describe('AppController', () => {
   const originalRules = process.env.SENTRY_IGNORE_RULES;
+  const originalSendUnresolved = process.env.SEND_UNRESOLVED_NOTIFICATIONS;
   let controller: AppController;
   let service: {
     getHello: jest.Mock;
@@ -15,6 +16,7 @@ describe('AppController', () => {
   let logger: { info: jest.Mock; warn: jest.Mock; error: jest.Mock };
 
   beforeEach(() => {
+    delete process.env.SEND_UNRESOLVED_NOTIFICATIONS;
     process.env.SENTRY_IGNORE_RULES = JSON.stringify([
       { title: '*ExampleError*', category: 'exception.ExampleError' },
     ]);
@@ -42,11 +44,16 @@ describe('AppController', () => {
     } else {
       process.env.SENTRY_IGNORE_RULES = originalRules;
     }
+    if (originalSendUnresolved === undefined) {
+      delete process.env.SEND_UNRESOLVED_NOTIFICATIONS;
+    } else {
+      process.env.SEND_UNRESOLVED_NOTIFICATIONS = originalSendUnresolved;
+    }
   });
 
-  async function webhook(data: unknown) {
+  async function webhook(data: unknown, action = 'triggered') {
     const response = controller.webhooks({
-      action: 'triggered',
+      action,
       data,
     } as SentryRequestType);
     await new Promise((resolve) => setImmediate(resolve));
@@ -56,6 +63,36 @@ describe('AppController', () => {
 
   it('returns the hello response', () => {
     expect(controller.getHello()).toEqual({ message: 'Hello World!' });
+  });
+
+  it('sends unresolved notifications by default', async () => {
+    await webhook(
+      { issue: { id: '123', title: 'Unrelated error' } },
+      'unresolved',
+    );
+    expect(service.sentTelegramMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ issueAction: 'unresolved' }),
+    );
+  });
+
+  it('skips unresolved notifications when disabled', async () => {
+    process.env.SEND_UNRESOLVED_NOTIFICATIONS = ' false ';
+    await webhook(
+      { issue: { id: '123', title: 'Unrelated error' } },
+      'unresolved',
+    );
+    expect(service.getIssueDetail).not.toHaveBeenCalled();
+    expect(service.sentTelegramMessage).not.toHaveBeenCalled();
+    expect(logger.info).toHaveBeenCalledWith('Unresolved notification skipped');
+  });
+
+  it('still sends other actions when unresolved notifications are disabled', async () => {
+    process.env.SEND_UNRESOLVED_NOTIFICATIONS = 'false';
+    await webhook(
+      { issue: { id: '123', title: 'Unrelated error' } },
+      'triggered',
+    );
+    expect(service.sentTelegramMessage).toHaveBeenCalledTimes(1);
   });
 
   it.each(['event', 'error'])(

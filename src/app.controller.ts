@@ -53,6 +53,14 @@ export class AppController {
           return;
         }
 
+        const sendUnresolvedNotifications =
+          process.env.SEND_UNRESOLVED_NOTIFICATIONS?.trim().toLowerCase() !==
+          'false';
+        if (action === 'unresolved' && !sendUnresolvedNotifications) {
+          this.logger.info('Unresolved notification skipped');
+          return;
+        }
+
         let title: string;
         let culprit: string;
         let projectName: string = 'Unknown';

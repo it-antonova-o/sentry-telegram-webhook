@@ -43,6 +43,7 @@ $ npm install
 | SENTRY_ORGANIZATION_SLUG       | Yes        | string | The organization slug in your sentry organization setting                                                                                                                                                                                     |       |
 | SENTRY_PROJECT_SLUG_ALLOW_LIST | No         | string | your Project slug list (Not require - split with comma `,` character)setting                                                                                                                                                                  |       |
 | SEND_RESOLVED_NOTIFICATIONS    | No         | boolean | Send resolved issue notifications. Defaults to `false`                                                                                                                                                                                       | false |
+| SEND_UNRESOLVED_NOTIFICATIONS  | No         | boolean | Send unresolved issue notifications. Defaults to `true`; set to `false` to skip them.                                                                                                                                                        | true |
 | SENTRY_IGNORE_RULES            | No         | JSON array | Rules suppressing Telegram notifications by `title` and/or `category`. Defaults to `[]`. See below. | [] |
 
 ### Ignoring selected errors
@@ -100,6 +101,7 @@ For Docker Compose, add this entry under `environment`:
    SENTRY_ORGANIZATION_SLUG=<your Sentry org slug>
    SENTRY_PROJECT_SLUG_ALLOW_LIST=<your Project slug list (Not require - split with comma `,` character)>
    SEND_RESOLVED_NOTIFICATIONS=false
+   SEND_UNRESOLVED_NOTIFICATIONS=false
    ```
 
 3. Run with npm
@@ -136,6 +138,7 @@ For Docker Compose, add this entry under `environment`:
       -e SENTRY_ORGANIZATION_SLUG=<SENTRY_ORGANIZATION_SLUG> \ #your Sentry org slug
       -e SENTRY_PROJECT_SLUG_ALLOW_LIST=<SENTRY_PROJECT_SLUG_ALLOW_LIST> \ #your Project slug list (Not require - split with comma `,` character)
       -e SEND_RESOLVED_NOTIFICATIONS=false \
+      -e SEND_UNRESOLVED_NOTIFICATIONS=false \
       tuanngocptn/sentry-telegram-webhook:latest
     ```
 
@@ -160,6 +163,7 @@ For Docker Compose, add this entry under `environment`:
         - SENTRY_ORGANIZATION_SLUG=<your Sentry org slug>
         - SENTRY_PROJECT_SLUG_ALLOW_LIST=<your Project slug list (Not require - split with comma `,` character)>
         - SEND_RESOLVED_NOTIFICATIONS=false
+        - SEND_UNRESOLVED_NOTIFICATIONS=false
       ports:
         - 3000:3000
       volumes:
@@ -187,6 +191,7 @@ For Docker Compose, add this entry under `environment`:
     - SENTRY_ORGANIZATION_SLUG=<your Sentry org slug>
     - SENTRY_PROJECT_SLUG_ALLOW_LIST=<your Project slug list (Not require - split with comma `,` character)>
     - SEND_RESOLVED_NOTIFICATIONS=false
+    - SEND_UNRESOLVED_NOTIFICATIONS=false
   ```
 
 - Run with docker:
@@ -216,6 +221,7 @@ For Docker Compose, add this entry under `environment`:
     - SENTRY_ORGANIZATION_SLUG=<your Sentry org slug>
     - SENTRY_PROJECT_SLUG_ALLOW_LIST=<your Project slug list (Not require - split with comma `,` character)>
     - SEND_RESOLVED_NOTIFICATIONS=false
+    - SEND_UNRESOLVED_NOTIFICATIONS=false
   ```
 
 - Run with docker:
